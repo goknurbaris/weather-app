@@ -6,6 +6,7 @@
 // ⭐ ELEMENT TANIMLAMALARI
 const input = document.getElementById("cityInput");
 const button = document.getElementById("searchBtn");
+const searchForm = document.getElementById("searchForm");
 const cityText = document.getElementById("cityName");
 const tempText = document.getElementById("temp");
 const windText = document.getElementById("wind");
@@ -14,6 +15,18 @@ const loading = document.getElementById("loading");
 const effectContainer = document.getElementById("effect-container");
 const forecastDiv = document.getElementById("forecast");
 const locationButton = document.getElementById("locationBtn");
+const feedback = document.getElementById("feedback");
+
+function showFeedback(message, type = "success") {
+    feedback.textContent = message;
+    feedback.classList.remove("hidden", "error", "success");
+    feedback.classList.add(type);
+}
+
+function clearFeedback() {
+    feedback.textContent = "";
+    feedback.className = "feedback hidden";
+}
 
 function setLoadingState(isLoading) {
     loading.classList.toggle("hidden", !isLoading);
@@ -25,10 +38,11 @@ function setLoadingState(isLoading) {
 async function searchWeather() {
     const city = input.value.trim();
     if (city === "") {
-        alert("Lütfen bir şehir adı giriniz.");
+        showFeedback("Lütfen bir şehir adı giriniz.", "error");
         return;
     }
 
+    clearFeedback();
     setLoadingState(true);
 
     try {
@@ -45,16 +59,18 @@ async function searchWeather() {
 
         changeBackground(data.current_weather.weathercode);
         showForecast(data);
+        showFeedback(`${data.city_name} için hava durumu güncellendi.`);
 
     } catch (error) {
         console.error("Hava durumu hatası:", error);
-        alert("Hata: " + error.message);
+        showFeedback("Hata: " + error.message, "error");
     } finally {
         setLoadingState(false);
     }
 }
 
 async function searchWeatherByCoordinates(lat, lon) {
+    clearFeedback();
     setLoadingState(true);
 
     try {
@@ -69,9 +85,10 @@ async function searchWeatherByCoordinates(lat, lon) {
         renderWeather(data);
         changeBackground(data.current_weather.weathercode);
         showForecast(data);
+        showFeedback("Konumunuza göre hava durumu güncellendi.");
     } catch (error) {
         console.error("Konuma göre hava durumu hatası:", error);
-        alert("Hata: " + error.message);
+        showFeedback("Hata: " + error.message, "error");
     } finally {
         setLoadingState(false);
     }
@@ -178,10 +195,14 @@ function showForecast(data) {
     }
 }
 
-button.addEventListener("click", searchWeather);
+searchForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    searchWeather();
+});
+
 locationButton.addEventListener("click", () => {
     if (!navigator.geolocation) {
-        alert("Tarayıcınız konum desteği sunmuyor.");
+        showFeedback("Tarayıcınız konum desteği sunmuyor.", "error");
         return;
     }
 
@@ -191,14 +212,8 @@ locationButton.addEventListener("click", () => {
         },
         (error) => {
             console.error("Konum hatası:", error);
-            alert("Konum bilgisi alınamadı. İzin verdiğinizden emin olun.");
+            showFeedback("Konum bilgisi alınamadı. İzin verdiğinizden emin olun.", "error");
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
-});
-
-input.addEventListener("keypress", e => {
-    if (e.key === "Enter") {
-        searchWeather();
-    }
 });

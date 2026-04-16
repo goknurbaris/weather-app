@@ -10,31 +10,31 @@
 </head>
 
 <body>
-
     <div id="effect-container"></div>
 
-    <div class="container">
+    <main class="container" aria-live="polite">
         <h1>Hava Durumu</h1>
 
-        <div class="search-box">
-            <input id="cityInput" type="text" placeholder="Şehir giriniz...">
-            <button id="searchBtn">Ara</button>
-            <button id="locationBtn" type="button" title="Konumumu Bul">📍</button>
-        </div>
+        <form class="search-box" id="searchForm" novalidate>
+            <label for="cityInput" class="sr-only">Şehir adı</label>
+            <input id="cityInput" type="text" placeholder="Şehir giriniz..." autocomplete="off" required>
+            <button id="searchBtn" type="submit">Ara</button>
+            <button id="locationBtn" type="button" title="Konumumu Bul" aria-label="Konumumu bul">📍</button>
+        </form>
 
-        <p id="suggestion" style="display:none;"></p>
+        <p id="feedback" class="feedback hidden" role="status" aria-live="polite"></p>
 
-        <div class="weather-card">
+        <section class="weather-card" aria-label="Anlık hava durumu">
             <h2 id="cityName">Şehir Seçin</h2>
             <p>Sıcaklık: <span id="temp">--</span> °C</p>
             <p>Durum: <span id="weatherStatus">--</span></p>
             <p>Rüzgar: <span id="wind">--</span> km/h</p>
-        </div>
+        </section>
 
-        <div class="forecast-container" id="forecast"></div>
+        <section class="forecast-container" id="forecast" aria-label="5 günlük tahmin"></section>
 
-        <div id="loading" class="loading hidden">Yükleniyor...</div>
-    </div>
+        <div id="loading" class="loading hidden" role="status" aria-live="polite">Yükleniyor...</div>
+    </main>
 
     <script src="{{ asset('js/script.js') }}"></script>
 </body>
